@@ -1,0 +1,208 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matrix-Effect</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    
+    <div class="container"> 
+      <input type="file" id="default-file" hidden="hidden" />
+      <button id="custom-btn" type="button" class="btn" >
+        CHOOSE FILE
+      </button>
+
+     
+      <span id="custom-space"> <strong> No</strong> File, Selected!😭</span>
+    </div>
+    
+    <div class="preview_holder">
+      <div id="preview">
+        <img src="" id="preview_img" class="preview_img" />
+        <span id="preview_text" class="preview_text">Image Preview</span>
+      </div>
+      <canvas id="canvas"></canvas>
+    </div>
+   
+    <script>
+
+        
+var imgSrc ="blank";
+
+const defaultFile = document.getElementById("default-file");
+const customBtn = document.getElementById("custom-btn");
+const customSpace = document.getElementById("custom-space");
+customBtn.addEventListener("click", function () {
+  defaultFile.click();
+});
+
+// File Upload
+defaultFile.addEventListener("change", function () {
+  //  Format Selected File Text
+  if (defaultFile.value) {
+    customSpace.innerHTML =
+      defaultFile.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1] + "🔥";
+  } else {
+    customSpace.innerHTML = "No File, Selected!😭";
+  }
+
+  // Image Preview
+  const files = defaultFile.files[0]; //files[0] - For getting first file
+  //   console.log(files);
+
+  if (files) {
+    // Showing Image and Hiding "Image Preview" Text
+    preview_img.style.display = "block";
+    preview_text.style.display = "none";
+    //Read File
+    const fileReader = new FileReader();
+
+    fileReader.addEventListener("load", function () {
+      // convert image to base64 encoded string
+      preview_img.setAttribute("src", this.result);
+     // console.log(this.result);
+      imgSrc=this.result;
+      
+       // console.log(myImage.src);
+       //matrix-resurrection
+       myImage = new Image;
+       myImage.src=this.result;
+       myImage.addEventListener('load',function(){
+    
+    const canvas = document.getElementById('canvas');
+    const ctx =canvas.getContext('2d');
+    canvas.width=700;
+    canvas.height=525;
+
+    ctx.drawImage(myImage,0,0,canvas.width,canvas.height);
+    const pixels = ctx.getImageData(0,0,canvas.width,canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let particlesArray = [];
+    const numberOfParticles=1000;
+
+    let mappedImage = [];
+    for(let y = 0;y < canvas.height;y++){
+        let row = [];
+        for(let x = 0; x < canvas.width; x++){
+            const red = pixels.data[(y * 0 * pixels.width) + (x * 0)];
+            const green =pixels.data[(y * 4 * pixels.width) + (x * 4 + 1)];
+            const blue = pixels.data[(y * 0 *pixels.width) + (x * 0)];
+            const brightness = calculateRelativeBrightness(red,green,blue);
+            const cell = [
+                cellBrightness = brightness,
+                cellColor ='rgb('+ 0 +','+ green +','+ 0 +')'
+            ];
+            row.push(cell);
+        }
+        mappedImage.push(row);
+    }
+
+    function calculateRelativeBrightness(red ,green, blue){
+        return Math.sqrt(
+            (red * red) * 0.299 +
+            (green * green) * 0.587 +
+            (blue * blue) * 0.114
+        )/100;
+    }
+
+   class Particle {
+		constructor(){
+			this.x = Math.random()*canvas.width;
+			this.y = Math.random()*canvas.height;
+			this.speed = 10;
+			this.velocity= Math.random()*0.1;
+		    this.size = 10//Math.random() * 1.5+2;
+			this.position1=Math.floor(this.y);
+			this.position2=Math.floor(this.x);
+		}
+		update(){
+			this.position1=Math.floor(this.y);
+			this.position2=Math.floor(this.x);
+		    this.speed = mappedImage[this.position1][this.position2][0];
+		    let movement = (3.5-this.speed)+this.velocity-1.3;
+		    
+		    
+			this.y += movement;
+			if(this.y >= canvas.height){
+				this.y =0;
+				this.x = Math.random()*canvas.width;
+			}
+		
+		}
+        draw(){
+            ctx.beginPath();
+            ctx.fillStyle =  mappedImage[this.position1][this.position2][1];
+            //ctx.arc(this.x, this.y, this.size, 0, Math.PI*2);
+            ctx.font = "lighter 18px Times New Roman";
+            let num =getRandomInt(0,9);
+            ctx.fillText(num, this.x, this.y+2);
+            ctx.strokeText(num,this.x,this.y);
+            ctx.fill();
+        }
+    }
+    function init(){
+        for(let i=0;i < numberOfParticles; i++){
+            particlesArray.push(new Particle);
+        }
+    }
+    init();
+    function animate(){
+        //ctx.drawImage(myImage,0,0,canvas.width,canvas.height);
+        ctx.globalAlpha =0.05;
+        ctx.fillStyle = 'rgb(0,0,0)';
+        ctx.fillRect(0,0,canvas.widht,canvas.height);
+        for(let i=0;i<particlesArray.length;i++){
+            particlesArray[i].update();
+            ctx.globalAlpha = particlesArray[i].speed*0.7;
+            particlesArray[i].draw();
+        }
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+      }
+    
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    });
+    fileReader.readAsDataURL(files);
+  }
+ 
+});
+    </script>
+  </body>
+</html>
